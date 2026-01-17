@@ -1,0 +1,54 @@
+query getGithubUser($login: String!) {
+    user(login: $login) {
+        contributionsCollection {
+            contributionYears
+            contributionCalendar {
+                weeks {
+                    contributionDays {
+                        contributionCount
+                        date
+                    }
+                }
+                totalContributions
+            }
+        }
+        avatarUrl
+        createdAt
+        name
+        websiteUrl
+        pullRequests(first: 1) {
+            totalCount
+            nodes {
+                closed
+            }
+        }
+        issues(first: 1) {
+            totalCount
+            nodes {
+                closed
+            }
+        }
+        repositories(first: 100) {
+            totalCount
+            nodes {
+                archivedAt
+                createdAt
+                description
+                diskUsage
+                homepageUrl
+                isPrivate
+                name
+                isFork
+                languages(first: 100) {
+                    totalCount
+                    totalSize
+                    nodes {
+                        color
+                        name
+                    }
+                }
+                updatedAt
+            }
+        }
+    }
+}
