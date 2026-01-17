@@ -1,0 +1,16 @@
+query getGithubUserContributions($username: String!, $streakFrom: DateTime, $streakTo: DateTime) {
+    user(login: $username) {
+        contributionsCollection(from: $streakFrom, to: $streakTo) {
+            contributionYears
+            contributionCalendar {
+                weeks {
+                    contributionDays {
+                        contributionCount
+                        date
+                    }
+                }
+                totalContributions
+            }
+        }
+    }
+}

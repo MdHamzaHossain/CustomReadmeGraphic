@@ -38,11 +38,12 @@ interface GithubRepositoryConnection {
 }
 interface GithubContributionsCollection {
     contributionCalendar: {
-        weeks: {
+        weeks: Array<{
             contributionDays: {
+                contributionCount: number;
                 date: string;
-            };
-        };
+            }[];
+        }>;
         totalContributions: number;
     };
 }
@@ -56,14 +57,25 @@ export interface GithubUser {
     repositories: GithubRepositoryConnection[];
     websiteUrl: string;
     followers: { totalCount: number };
-    contributionsCollection: GithubContributionsCollection[];
-}
-interface GithubGetUserData {
-    user: GithubUser;
+    contributionsCollection: GithubContributionsCollection;
 }
 interface GithubGetUserOutput {
-    login: string;
+    user: GithubUser;
+}
+interface GithubGetUserData {
+    username: string;
+    streakTo?: string;
+    streakFrom?: string;
+}
+interface GithubGetUserContributionsOutput {
+    user: Pick<GithubUser, "contributionsCollection">;
+}
+interface GithubGetUserContributionsData {
+    username: string;
+    streakTo?: string;
+    streakFrom?: string;
 }
 export interface GithubRequestsData {
-    getGithubUser: [GithubGetUserData, GithubGetUserOutput];
+    getGithubUser: [GithubGetUserOutput, GithubGetUserData];
+    getGithubContributions: [GithubGetUserContributionsOutput, GithubGetUserContributionsData];
 }

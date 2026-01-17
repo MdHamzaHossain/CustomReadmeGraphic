@@ -1,6 +1,6 @@
-query getGithubUser($login: String!) {
-    user(login: $login) {
-        contributionsCollection {
+query getGithubUser($username: String!, $streakFrom: DateTime) {
+    user(login: $username) {
+        contributionsCollection(from: $streakFrom) {
             contributionYears
             contributionCalendar {
                 weeks {
