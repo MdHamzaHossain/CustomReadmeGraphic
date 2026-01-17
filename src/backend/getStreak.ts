@@ -1,6 +1,6 @@
 import { setTimeout } from "node:timers/promises";
-import { GITHUB_USERNAME, requestGithub } from "./common/http.js";
-import { GithubUser } from "./types/schemas.js";
+import { GITHUB_USERNAME, requestGithub } from "./http.js";
+import { GithubUser } from "../types/schemas.js";
 
 interface GithubStreak {
     start: Date;
@@ -22,30 +22,36 @@ export async function generateStreak(
             days.push(day);
         }
     }
+    // @ts-expect-error: Date arithmatic is valid
+    days.sort((a, b) => new Date(b.date) - new Date(a.date));
 
     while (new Date(days.at(-1)?.date ?? createdAt) > creationDate) {
         await setTimeout(500);
         const newTo = new Date(days.at(-1)!.date);
-        const newFrom = new Date(newTo);
+        let newFrom = new Date(newTo);
+        newFrom = new Date(newTo);
+        // console.log(`1 Fetching from   ${newFrom.toUTCString()} to ${newTo.toDateString()}`);
+
         newFrom.setFullYear(newTo.getUTCFullYear() - 1);
 
         const newData = await fetchUserGithubContributions(newFrom, newTo);
 
         if (newData) {
-            weeks = newData.contributionsCollection.contributionCalendar.weeks;
+            weeks = newData.contributionsCollection.contributionCalendar.weeks.reverse();
         }
-        //console.log(`Fetching from   ${newFrom.toUTCString()} to ${newTo.toDateString()}`);
         for (const week of weeks) {
             for (const day of week.contributionDays) {
                 days.push(day);
             }
         }
+        // console.log(" Debug date : ");
         // break;
     }
-    let currentStreak = 0;
-    let mxStreak = 0;
     // @ts-expect-error: Date arithmatic is valid
     days.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    let currentStreak = 0;
+    let mxStreak = 0;
     let startDate = days[0].date;
     let endDate = days[0].date;
     let strk: GithubStreak = {
@@ -91,11 +97,13 @@ export async function generateStreak(
     return strk;
 }
 export async function fetchUserGithubContributions(from: Date, to: Date) {
-    return requestGithub("getGithubContributions", {
+    const res = await requestGithub("getGithubContributions", {
         username: GITHUB_USERNAME,
         streakFrom: from.toISOString(),
         streakTo: to.toISOString(),
     })
         .then((a) => a?.user)
         .catch(() => undefined);
+    // console.log(res?.contributionsCollection.contributionCalendar.totalContributions);
+    return res;
 }
